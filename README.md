@@ -1,6 +1,6 @@
 # Bsky data project
 
-This is a project to 
+This is a project to analyze and visualize some of my bsky data.
 
 ## How to use
 
