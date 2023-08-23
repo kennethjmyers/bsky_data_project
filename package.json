@@ -1,5 +1,5 @@
 {
-  "type": "commonjs",
+  "type": "commonjs", 
   "devDependencies": {
     "@types/node": "^20.4.10",
     "ts-node": "^10.9.1",

@@ -77,7 +77,7 @@ export function get_op_post_ts (feedViewPost: AppBskyFeedDefs.FeedViewPost): Dat
   return this_ts
 }
 
-if (typeof module !== 'undefined' && !module.parent) {
+if (typeof require !== 'undefined' && require.main === module) {
   // this is the main module
   get_post_history()
 }

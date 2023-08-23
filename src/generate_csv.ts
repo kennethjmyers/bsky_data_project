@@ -6,7 +6,7 @@ import { AppBskyFeedDefs } from '@atproto/api';
 import fs from 'fs'
 // console.log(tweet_data);
 
-var csv_content = 'date,time,uri\n'
+var csv_content = 'date,time,uri\n'  // header
 // Transform data and create a csv of the tweet data
 tweet_data.forEach(function (element: AppBskyFeedDefs.FeedViewPost) {
   var createdAt_ts = get_op_post_ts(element)
@@ -21,8 +21,6 @@ tweet_data.forEach(function (element: AppBskyFeedDefs.FeedViewPost) {
 let writeStream = fs.createWriteStream(`data/last_${lookback_days}_days_posts.csv`)
 writeStream.write(csv_content)
 writeStream.end()
-
-
 
 
 // Original way I wrote this before realizing you could import json directly

@@ -1,6 +1,6 @@
 {
   "ts-node": { 
-    "esm": true,
+    // "esm": true,    /* this is equivalent to ts-node --esm or ts-node-esm */
     "experimentalSpecifierResolution": "node" 
   },
   "compilerOptions": {
