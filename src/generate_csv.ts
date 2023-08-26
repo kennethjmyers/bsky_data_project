@@ -14,15 +14,33 @@ function isRepost (element: AppBskyFeedDefs.FeedViewPost) {
   }
 }
 
-var csv_content = 'date,time,uri,repost\n'  // header
+function isReply (element: AppBskyFeedDefs.FeedViewPost) {
+  if (element.reply) {
+    return true
+  } else {
+    return false
+  }
+}
+
+function getCategory (element: AppBskyFeedDefs.FeedViewPost) {
+  if (isRepost(element)) {
+    return 'repost'
+  } else if (isReply(element)) {
+    return 'reply'
+  } else {
+    return 'original post'
+  }
+}
+
+var csv_content = 'date,time,uri,category\n'  // header
 // Transform data and create a csv of the tweet data
 tweet_data.forEach(function (element: AppBskyFeedDefs.FeedViewPost) {
   var createdAt_ts = get_op_post_ts(element)
   var date = createdAt_ts.toLocaleDateString()
   var time = createdAt_ts.toLocaleTimeString()
   var uri = element.post.uri
-  var repost = isRepost(element)
-  var this_row = [date, time, uri, repost].join(',')+'\n'
+  var category = getCategory(element)
+  var this_row = [date, time, uri, category].join(',')+'\n'
   csv_content += this_row
 });
 
