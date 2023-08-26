@@ -53,7 +53,7 @@ export async function get_post_history(lookback_days: number = 14) {
   console.log(tweets.length, "tweets found.")
 
   // write  contents to file
-  var outfile = `data/last_${lookback_days}_days_posts.json`
+  var outfile = `data/post_history.json`
   fs.writeFile(outfile, JSON.stringify(tweets), function(err) {
     if (err) {
         console.log(err);
@@ -79,5 +79,5 @@ export function get_op_post_ts (feedViewPost: AppBskyFeedDefs.FeedViewPost): Dat
 
 if (typeof require !== 'undefined' && require.main === module) {
   // this is the main module
-  get_post_history()
+  get_post_history(90)
 }
