@@ -32,19 +32,32 @@ function getCategory (element: AppBskyFeedDefs.FeedViewPost): string {
   }
 }
 
-let csvContent = 'date,time,uri,category\n' // header
-// Transform data and create a csv of the tweet data
-tweetData.forEach(function (element: AppBskyFeedDefs.FeedViewPost) {
-  const createdAtTs = getOPPostTs(element)
-  const date = createdAtTs.toLocaleDateString()
-  const time = createdAtTs.toLocaleTimeString()
-  const uri = element.post.uri
-  const category = getCategory(element)
-  const thisRow = [date, time, uri, category].join(',') + '\n'
-  csvContent += thisRow
-})
+function postDataString (): string {
+  let csvContent = 'date,time,uri,category\n' // header
+  // Transform data and create a csv of the tweet data
+  tweetData.forEach(function (element: AppBskyFeedDefs.FeedViewPost) {
+    const createdAtTs = getOPPostTs(element)
+    const date = createdAtTs.toLocaleDateString()
+    const time = createdAtTs.toLocaleTimeString()
+    const uri = element.post.uri
+    const category = getCategory(element)
+    const thisRow = [date, time, uri, category].join(',') + '\n'
+    csvContent += thisRow
+  })
+  return csvContent
+}
 
-// console.log(csv_content)
-const writeStream = fs.createWriteStream('data/post_history.csv')
-writeStream.write(csvContent)
-writeStream.end()
+/**
+ * This function generates and CSV string and writes that to a file location.
+ * @param stringFunc the function that generates the csv str
+ * @param outfile the output file name
+ */
+export function GenerateCSV (stringFunc: () => string, outfile: string): void {
+  const csvContent = stringFunc()
+  // console.log(csv_content)
+  const writeStream = fs.createWriteStream(outfile)
+  writeStream.write(csvContent)
+  writeStream.end()
+}
+
+GenerateCSV(postDataString, 'data/post_history.csv')
