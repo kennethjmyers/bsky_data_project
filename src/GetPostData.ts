@@ -1,20 +1,10 @@
 #!/usr/bin/env ts-node
-
 import { BskyAgent, type AppBskyFeedDefs, type AppBskyFeedPost } from '@atproto/api'
-// import { logger } from "./logger.js"
-import dotenv from 'dotenv'
+import { IDENTIFIER, PASSWORD } from './Utils'
 import fs from 'fs'
-
-dotenv.config()
-if (process.env.IDENTIFIER === undefined) { throw new Error('.env IDENTIFIER not found') }
-if (process.env.PASSWORD === undefined) { throw new Error('.env PASSWORD not found') }
-
-const IDENTIFIER = process.env.IDENTIFIER
-const PASSWORD = process.env.PASSWORD
+// import { logger } from "./logger.js"
 
 export async function getPostHistory (lookbackDays: number = 14): Promise<void> {
-  dotenv.config()
-
   const agent = new BskyAgent({
     service: 'https://bsky.social'
     // persistSession: (evt: AtpSessionEvent, sess?: AtpSessionData) => {
@@ -32,15 +22,15 @@ export async function getPostHistory (lookbackDays: number = 14): Promise<void> 
   console.log('Two weeks ago:', startDate)
   let cursor = ''
   const tweets: AppBskyFeedDefs.FeedViewPost[] = []
-  while (minTs > startDate) {
+  while (minTs > startDate && cursor !== undefined) {
     console.log(cursor)
-    const authorFeedParams = {
+    const params = {
       actor: IDENTIFIER,
-      // limit?: number;
+      limit: 100,
       cursor
       // filter?: 'posts_with_replies' | 'posts_no_replies' | 'posts_with_media' | (string & {});
     }
-    const res = await agent.getAuthorFeed(authorFeedParams)
+    const res = await agent.getAuthorFeed(params)
     cursor = res.data.cursor as string
     const newTweets = res.data.feed
     newTweets.forEach((element) => {
@@ -83,5 +73,5 @@ export function getOPPostTs (feedViewPost: AppBskyFeedDefs.FeedViewPost): Date {
 
 if (typeof require !== 'undefined' && require.main === module) {
   // this is the main module
-  void getPostHistory(90)
+  void getPostHistory(120)
 }
