@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
-import { BskyAgent, AppBskyActorDefs } from '@atproto/api'
+import { BskyAgent, type AppBskyActorDefs } from '@atproto/api'
 import { IDENTIFIER, PASSWORD } from './Utils'
-import fs from 'fs'
+import fs from 'fs/promises'
 // import { logger } from "./logger.js"
 
 export async function getFollowing (): Promise<void> {
@@ -28,9 +28,10 @@ export async function getFollowing (): Promise<void> {
     follows.forEach((f) => {
       const thisDID = f.did
       const params = { actor: thisDID, limit: 1 }
-      const res = agent.getAuthorFeed(params)
+      void agent.getAuthorFeed(params).then((res) => {
+        f.lastPost = res
+      })
       // build a new object out of select follow data and their most recent tweet
-      f.lastPost = res
       jsonData.push(f)
     })
     console.log(res)
@@ -39,10 +40,10 @@ export async function getFollowing (): Promise<void> {
 
   // write  contents to file
   const outfile = 'data/follows.json'
-  fs.writeFile(outfile, JSON.stringify(jsonData), function (err) {
-    if (err != null) {
-      console.log(err)
-    }
+  await fs.writeFile(outfile, JSON.stringify(jsonData)).then(() => {
+    console.log('write successful')
+  }).catch(err => {
+    console.error(err)
   })
 }
 
