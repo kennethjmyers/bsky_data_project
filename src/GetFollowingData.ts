@@ -1,28 +1,20 @@
 #!/usr/bin/env ts-node
-import { BskyAgent, type AppBskyFeedDefs, type AppBskyFeedPost } from '@atproto/api'
+import { BskyAgent, AppBskyActorDefs } from '@atproto/api'
 import { IDENTIFIER, PASSWORD } from './Utils'
 import fs from 'fs'
 // import { logger } from "./logger.js"
 
-export async function getPostHistory (lookbackDays: number = 14): Promise<void> {
+export async function getFollowing (): Promise<void> {
   const agent = new BskyAgent({
     service: 'https://bsky.social'
     // persistSession: (evt: AtpSessionEvent, sess?: AtpSessionData) => {
     //   // store the session-data for reuse
     // }
   })
-
   await agent.login({ identifier: IDENTIFIER, password: PASSWORD })
-  // await agent.post({ text: "test post" })
-  // get pass data
-  const today = new Date()
-  const startDate = new Date(new Date().setDate(today.getDate() - lookbackDays))
-  let minTs = today
-  console.log('Now:', today)
-  console.log('Two weeks ago:', startDate)
   let cursor = ''
-  const tweets: AppBskyFeedDefs.FeedViewPost[] = []
-  while (minTs > startDate || cursor !== undefined) {
+  const jsonData: AppBskyActorDefs.ProfileView[] = []
+  while (cursor !== undefined) {
     console.log(cursor)
     const params = {
       actor: IDENTIFIER,
@@ -31,25 +23,30 @@ export async function getPostHistory (lookbackDays: number = 14): Promise<void> 
     }
     const res = await agent.getFollows(params)
     cursor = res.data.cursor as string
-    const newTweets = res.data.feed
-    newTweets.forEach((element) => {
-      const thisTs = getOPPostTs(element)
-      if (thisTs < minTs) {
-        minTs = thisTs
-      }
-      tweets.push(element)
+    const follows = res.data.follows
+    // for each user get their latest tweet
+    follows.forEach((f) => {
+      const thisDID = f.did
+      const params = { actor: thisDID, limit: 1 }
+      const res = agent.getAuthorFeed(params)
+      // build a new object out of select follow data and their most recent tweet
+      f.lastPost = res
+      jsonData.push(f)
     })
-    console.log(minTs)
+    console.log(res)
   }
-
-  // console.log(tweets))
-  console.log(tweets.length, 'tweets found.')
+  console.log(jsonData.length, 'follows found.')
 
   // write  contents to file
-  const outfile = 'data/post_history.json'
-  fs.writeFile(outfile, JSON.stringify(tweets), function (err) {
+  const outfile = 'data/follows.json'
+  fs.writeFile(outfile, JSON.stringify(jsonData), function (err) {
     if (err != null) {
       console.log(err)
     }
   })
+}
+
+if (typeof require !== 'undefined' && require.main === module) {
+  // this is the main module
+  void getFollowing()
 }

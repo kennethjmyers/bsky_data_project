@@ -11,10 +11,7 @@ export async function getPostHistory (lookbackDays: number = 14): Promise<void> 
     //   // store the session-data for reuse
     // }
   })
-
   await agent.login({ identifier: IDENTIFIER, password: PASSWORD })
-  // await agent.post({ text: "test post" })
-  // get pass data
   const today = new Date()
   const startDate = new Date(new Date().setDate(today.getDate() - lookbackDays))
   let minTs = today
