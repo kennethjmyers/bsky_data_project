@@ -2,6 +2,7 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^20.4.10",
+    "@types/papaparse": "^5.3.8",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "eslint": "^8.48.0",
     "eslint-config-prettier": "^8.6.0",
