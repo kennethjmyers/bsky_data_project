@@ -1,6 +1,7 @@
 #!/usr/bin/env ts-node
 import { BskyAgent, type AppBskyActorDefs, type AppBskyFeedDefs, type AppBskyFeedGetAuthorFeed } from '@atproto/api'
 import { IDENTIFIER, PASSWORD } from './Utils'
+import { getPostsForIdentifier } from './GetPostData'
 import fs from 'fs/promises'
 // import { logger } from "./logger.js"
 
@@ -17,7 +18,7 @@ export async function getFollowing (): Promise<void> {
   let cursor = ''
   const jsonData: AppBskyActorDefs.ProfileView[] = []
   while (cursor !== undefined) {
-    console.log(cursor)
+    console.log('Cursor: ', cursor)
     const params = {
       actor: IDENTIFIER,
       limit: 100,
@@ -30,13 +31,11 @@ export async function getFollowing (): Promise<void> {
     follows.forEach((f) => {
       // build a new object out of select follow data and their most recent tweet
       const thisDID = f.did
-      const params = { actor: thisDID, limit: 1 }
-      void agent.getAuthorFeed(params).then((res: AppBskyFeedGetAuthorFeed.Response) => {
+      void getPostsForIdentifier(agent, thisDID, 1, '').then((res: AppBskyFeedGetAuthorFeed.Response) => {
         f.lastPost = res.data.feed[0]
       })
       jsonData.push(f as FollowsData)
     })
-    console.log(res)
   }
   console.log(jsonData.length, 'follows found.')
 

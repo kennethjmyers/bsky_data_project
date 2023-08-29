@@ -1,10 +1,10 @@
 #!/usr/bin/env ts-node
-import { BskyAgent, type AppBskyFeedDefs, type AppBskyFeedPost } from '@atproto/api'
+import { BskyAgent, type AppBskyFeedDefs, type AppBskyFeedPost, type AppBskyFeedGetAuthorFeed} from '@atproto/api'
 import { IDENTIFIER, PASSWORD } from './Utils'
 import fs from 'fs'
 // import { logger } from "./logger.js"
 
-export async function getPostHistory (lookbackDays: number = 14): Promise<void> {
+export async function getAgent (): Promise<BskyAgent> {
   const agent = new BskyAgent({
     service: 'https://bsky.social'
     // persistSession: (evt: AtpSessionEvent, sess?: AtpSessionData) => {
@@ -12,6 +12,21 @@ export async function getPostHistory (lookbackDays: number = 14): Promise<void> 
     // }
   })
   await agent.login({ identifier: IDENTIFIER, password: PASSWORD })
+  return agent
+}
+
+export async function getPostsForIdentifier (agent: BskyAgent, identifier: string, limit: number = 100, cursor: string = ''): Promise<AppBskyFeedGetAuthorFeed.Response> {
+  const params = {
+    actor: identifier,
+    limit,
+    cursor
+    // filter?: 'posts_with_replies' | 'posts_no_replies' | 'posts_with_media' | (string & {});
+  }
+  return await agent.getAuthorFeed(params)
+}
+
+export async function getPostHistory (lookbackDays: number = 14): Promise<void> {
+  const agent = await getAgent()
   const today = new Date()
   const startDate = new Date(new Date().setDate(today.getDate() - lookbackDays))
   let minTs = today
@@ -21,13 +36,7 @@ export async function getPostHistory (lookbackDays: number = 14): Promise<void> 
   const tweets: AppBskyFeedDefs.FeedViewPost[] = []
   while (minTs > startDate && cursor !== undefined) {
     console.log(cursor)
-    const params = {
-      actor: IDENTIFIER,
-      limit: 100,
-      cursor
-      // filter?: 'posts_with_replies' | 'posts_no_replies' | 'posts_with_media' | (string & {});
-    }
-    const res = await agent.getAuthorFeed(params)
+    const res = await getPostsForIdentifier(agent, IDENTIFIER, 100, cursor)
     cursor = res.data.cursor as string
     const newTweets = res.data.feed
     newTweets.forEach((element) => {
