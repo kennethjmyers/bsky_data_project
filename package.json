@@ -16,6 +16,7 @@
   "dependencies": {
     "@atproto/api": "^0.6.3",
     "dotenv": "^16.3.1",
-    "es-main": "^1.2.0"
+    "es-main": "^1.2.0",
+    "papaparse": "^5.4.1"
   }
 }
