@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 import { BskyAgent, type AppBskyFeedDefs, type AppBskyFeedPost, type AppBskyFeedGetAuthorFeed} from '@atproto/api'
 import { IDENTIFIER, PASSWORD } from './Utils'
-import fs from 'fs'
+import fs from 'fs/promises'
 // import { logger } from "./logger.js"
 
 export async function getAgent (): Promise<BskyAgent> {
@@ -54,10 +54,10 @@ export async function getPostHistory (lookbackDays: number = 14): Promise<void> 
 
   // write  contents to file
   const outfile = 'data/post_history.json'
-  fs.writeFile(outfile, JSON.stringify(tweets), function (err) {
-    if (err != null) {
-      console.log(err)
-    }
+  await fs.writeFile(outfile, JSON.stringify(tweets)).then(() => {
+    console.log('write successful')
+  }).catch(err => {
+    console.error(err)
   })
 }
 

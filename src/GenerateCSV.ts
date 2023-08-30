@@ -86,7 +86,7 @@ function followsDataString (data: FollowsData[]): string {
     const handle = element.handle
     const displayName = element.displayName !== undefined ? element.displayName.trim() : '' // trim needed for rare \n ending name
     const avatar = element.avatar ?? ''
-    const followedDt = element.indexedAt ?? ''
+    const followedDt = element.createdAt ?? ''
     const lastPostUri = element.lastPost !== undefined ? element.lastPost.post.uri : ''
     const lastPostDt = element.lastPost !== undefined ? getOPPostTs(element.lastPost).toString() : ''
     const row: FollowsDataOutput = { did, handle, displayName, avatar, followedDt, lastPostUri, lastPostDt }
