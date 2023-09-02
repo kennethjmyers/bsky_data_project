@@ -26,6 +26,7 @@ interface FollowsDataOutput {
   followedDt: string
   lastPostUri: string
   lastPostDt: string
+  followsBack: string
 }
 
 function isRepost (element: AppBskyFeedDefs.FeedViewPost): boolean {
@@ -86,13 +87,14 @@ function followsDataString (data: FollowsData[]): string {
     const handle = element.handle
     const displayName = element.displayName !== undefined ? element.displayName.trim() : '' // trim needed for rare \n ending name
     const avatar = element.avatar ?? ''
-    const followedDt = element.createdAt ?? ''
+    const followedDt = element.createdAt !== undefined ? new Date(element.createdAt).toLocaleDateString() : ''
     const lastPostUri = element.lastPost !== undefined ? element.lastPost.post.uri : ''
-    const lastPostDt = element.lastPost !== undefined ? getOPPostTs(element.lastPost).toString() : ''
-    const row: FollowsDataOutput = { did, handle, displayName, avatar, followedDt, lastPostUri, lastPostDt }
+    const lastPostDt = element.lastPost !== undefined ? getOPPostTs(element.lastPost).toLocaleDateString() : ''
+    const followsBack = ((element.viewer?.followedBy !== undefined) && (element.viewer?.following !== undefined)) ? '1' : '0'
+    const row: FollowsDataOutput = { did, handle, displayName, avatar, followedDt, lastPostUri, lastPostDt, followsBack }
     output.push(row)
   })
-  const columns = ['did', 'handle', 'displayName', 'avatar', 'followedDt', 'lastPostUri', 'lastPostDt']
+  const columns = ['did', 'handle', 'displayName', 'avatar', 'followedDt', 'lastPostUri', 'lastPostDt', 'followsBack']
   const csvContent = Papa.unparse(output, { columns })
   return csvContent
 }
