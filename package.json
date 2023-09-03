@@ -1,4 +1,5 @@
 {
+  "name": "BskyDashData",
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^20.4.10",
