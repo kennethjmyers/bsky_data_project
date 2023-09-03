@@ -18,16 +18,29 @@ interface PostDataOutput {
   category: string
 }
 
-interface FollowsDataOutput {
-  did: string
-  handle: string
-  displayName: string
-  avatar: string
-  followedDt: string
-  lastPostUri: string
-  lastPostDt: string
-  followsBack: string
+interface Record {
+  text: string
 }
+
+const FollowsDataRowExample = {
+  did: '',
+  handle: '',
+  displayName: '',
+  avatar: '',
+  followedDt: '',
+  followsBack: '',
+  lastPostUri: '',
+  lastPostDt: '',
+  lastPostIsRepost: '',
+  lastPostAuthorHandle: '',
+  lastPostAuthorDisplayName: '',
+  lastPostAuthorAvatar: '',
+  lastPostContent: '',
+  lastPostLikes: '',
+  lastPostReposts: '',
+  lastPostReplies: ''
+}
+export type FollowsDataRow = typeof FollowsDataRowExample
 
 function isRepost (element: AppBskyFeedDefs.FeedViewPost): boolean {
   if ((element.reason != null) && (element.reason.$type as string).includes('#reasonRepost', 17)) {
@@ -81,20 +94,52 @@ function postDataString (data: AppBskyFeedDefs.FeedViewPost[]): string {
  * @returns csv string
  */
 function followsDataString (data: FollowsData[]): string {
-  const output: FollowsDataOutput[] = []
+  const output: FollowsDataRow[] = []
   data.forEach(function (element: FollowsData) {
     const did = element.did
     const handle = element.handle
     const displayName = element.displayName !== undefined ? element.displayName.trim() : '' // trim needed for rare \n ending name
     const avatar = element.avatar ?? ''
     const followedDt = element.createdAt !== undefined ? new Date(element.createdAt).toLocaleDateString() : ''
-    const lastPostUri = element.lastPost !== undefined ? element.lastPost.post.uri : ''
-    const lastPostDt = element.lastPost !== undefined ? getOPPostTs(element.lastPost).toLocaleDateString() : ''
     const followsBack = ((element.viewer?.followedBy !== undefined) && (element.viewer?.following !== undefined)) ? '1' : '0'
-    const row: FollowsDataOutput = { did, handle, displayName, avatar, followedDt, lastPostUri, lastPostDt, followsBack }
+    let lastPost
+    let lastPostRecord
+    if (element.lastPost !== undefined) {
+      lastPost = element.lastPost
+      lastPostRecord = element.lastPost.post.record as Record
+    }
+    const lastPostUri = lastPost !== undefined ? lastPost.post.uri : ''
+    const lastPostDt = lastPost !== undefined ? getOPPostTs(lastPost).toLocaleDateString() : ''
+    const lastPostIsRepost = lastPost?.reason !== undefined ? '1' : '0'
+    // console.log(lastPostRecord)
+    const lastPostAuthorHandle = lastPost?.post.author.handle !== undefined ? lastPost.post.author.handle : ''
+    const lastPostAuthorDisplayName = lastPost?.post.author.displayName !== undefined ? lastPost.post.author.displayName : ''
+    const lastPostAuthorAvatar = lastPost?.post.author.avatar !== undefined ? lastPost.post.author.avatar : ''
+    const lastPostContent = lastPostRecord !== undefined ? lastPostRecord.text : ''
+    const lastPostLikes = lastPost?.post.likeCount !== undefined ? lastPost.post.likeCount.toString() : ''
+    const lastPostReposts = lastPost?.post.repostCount !== undefined ? lastPost.post.repostCount.toString() : ''
+    const lastPostReplies = lastPost?.post.replyCount !== undefined ? lastPost.post.replyCount.toString() : ''
+    const row: FollowsDataRow = {
+      did,
+      handle,
+      displayName,
+      avatar,
+      followedDt,
+      followsBack,
+      lastPostUri,
+      lastPostDt,
+      lastPostIsRepost,
+      lastPostAuthorHandle,
+      lastPostAuthorDisplayName,
+      lastPostAuthorAvatar,
+      lastPostContent,
+      lastPostLikes,
+      lastPostReposts,
+      lastPostReplies
+    }
     output.push(row)
   })
-  const columns = ['did', 'handle', 'displayName', 'avatar', 'followedDt', 'lastPostUri', 'lastPostDt', 'followsBack']
+  const columns = Object.keys(FollowsDataRowExample)
   const csvContent = Papa.unparse(output, { columns })
   return csvContent
 }
