@@ -80,7 +80,7 @@ export async function getFollowing (): Promise<FollowsData[]> {
 
 async function writeJson(jsonData: AppBskyActorDefs.ProfileView[]): Promise<void> {
   // write  contents to file
-  const outfile = 'data/follows.json'
+  const outfile = 'src/data/follows.json'
   await fs.writeFile(outfile, JSON.stringify(jsonData)).then(() => {
     console.log('write successful')
   }).catch(err => {

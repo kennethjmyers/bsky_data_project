@@ -1,8 +1,8 @@
 // For below to work, set "resolveJsonModule": true in tsconfig.json
 import { type AppBskyFeedDefs } from '@atproto/api'
 import { type FollowsData } from './GetFollowingData'
-import postHistoryJson from '../data/post_history.json'
-import followJson from '../data/follows.json'
+import postHistoryJson from './data/post_history.json'
+import followJson from './data/follows.json'
 import { getOPPostTs } from './GetPostData'
 import fs from 'fs'
 import Papa from 'papaparse'

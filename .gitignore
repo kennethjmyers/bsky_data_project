@@ -1,6 +1,6 @@
 # data folder
-data/*.csv
-data/*.json
+src/data/*.csv
+src/data/*.json
 
 # Logs
 logs

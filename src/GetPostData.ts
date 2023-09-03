@@ -53,7 +53,7 @@ export async function getPostHistory (lookbackDays: number = 14): Promise<void> 
   console.log(tweets.length, 'tweets found.')
 
   // write  contents to file
-  const outfile = 'data/post_history.json'
+  const outfile = 'src/data/post_history.json'
   await fs.writeFile(outfile, JSON.stringify(tweets)).then(() => {
     console.log('write successful')
   }).catch(err => {
